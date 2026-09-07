@@ -1,3 +1,5 @@
+import os
+import tempfile
 from fastapi import FastAPI, UploadFile, File
 from ultralytics import YOLO
 import shutil
@@ -43,12 +45,18 @@ async def detect(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    image_path = "temp_image.jpg"
+    with tempfile.NamedTemporaryFile(
+      delete=False,
+      suffix=".jpg"
+    ) as temp_file:
 
-    with open(image_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+       image_path = temp_file.name
+       shutil.copyfileobj(file.file, temp_file)
 
-    results = model(image_path)
+    try:
+      results = model(image_path)
+    finally:
+      os.remove(image_path)
 
     detections = []
 

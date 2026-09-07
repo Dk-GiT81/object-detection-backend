@@ -40,11 +40,17 @@ def get_current_user(
         raise credentials_exception
 
     user = db.query(User).filter(
-        User.id == int(user_id)
+      User.id == int(user_id)
     ).first()
 
     if user is None:
-        raise credentials_exception
+      raise credentials_exception
+
+    if not user.is_active:
+      raise HTTPException(
+        status_code=403,
+        detail="User account is inactive"
+      )
 
     return user
 
