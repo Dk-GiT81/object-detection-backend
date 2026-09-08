@@ -35,7 +35,7 @@ def register(
         username=user.username,
         email=user.email,
         password_hash=hash_password(user.password),
-        role=user.role,
+        role="user",
         is_active=True
     )
 
